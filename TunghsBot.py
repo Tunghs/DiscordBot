@@ -3,17 +3,20 @@ import discord
 from selenium import webdriver
 from Champion import *
 
+# 창 없이 selenium 구동
 options = webdriver.ChromeOptions()
 options.add_argument('headless')
+# 유저 정보 추가
 options.add_argument('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/76.0.3809.100 Safari/537.36')
 driver = webdriver.Chrome('./chromedriver', chrome_options=options)
 
 client = discord.Client()
 
 # 생성된 토큰을 입력해준다.
-token = "NjA4ODg4MzkxMTAyMzY1Njk4.XV4q2w.Bbpr8cojfEk2VJHeG_dPWCvN4t4"
+token = "NjA4ODg4MzkxMTAyMzY1Njk4.XV6NnQ.ZR7xDwZJgn5P4saSkuqWdUGk-28"
 
-def Champ(name):
+# 챔피언 포지션 확인
+def ChampPositionCheck(name):
     if name in champName.name:
         name = champName.name[name]
 
@@ -21,8 +24,18 @@ def Champ(name):
         driver.get(url)
         driver.implicitly_wait(2)
 
-        href = driver.find_element_by_css_selector('body > div.l-wrap.l-wrap--champion > div.l-container > div > div.l-champion-statistics-header > div > ul > li.champion-stats-header__position.champion-stats-header__position--active > a > span.champion-stats-header__position__role')
-        championName = href.text
+        positionHref = driver.find_elements_by_css_selector('ul.champion-stats-position > li > a')
+
+        positionList = []
+
+        # 챔피언의 포지션 확인
+        for href in positionHref:
+            href = href.get_attribute("href")
+            splitList = href.split('/')
+            position = splitList[-1]
+            positionList.append(position)
+
+        championName = positionList
 
     else:
         championName = "다시 입력해주세요."
@@ -50,9 +63,8 @@ async def on_message(message):
 
     if message.content.startswith(';;champ'):
         channel = message.channel
-        msg = message.content.split(" ")
-        name = msg[1]
-        search = Champ(name)
+        name = message.content.replace(";;champ ","")
+        search = ChampPositionCheck(name)
         await channel.send(search)
 
 client.run(token)
