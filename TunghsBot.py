@@ -2,6 +2,7 @@ import asyncio
 import discord
 from selenium import webdriver
 from Champion import *
+from discord.ext import commands
 
 # 창 없이 selenium 구동
 options = webdriver.ChromeOptions()
@@ -13,10 +14,12 @@ driver = webdriver.Chrome('./chromedriver', chrome_options=options)
 client = discord.Client()
 
 # 생성된 토큰을 입력해준다.
-token = "NjA4ODg4MzkxMTAyMzY1Njk4.XV6NnQ.ZR7xDwZJgn5P4saSkuqWdUGk-28"
+token = "NjA4ODg4MzkxMTAyMzY1Njk4.XV6VVg.8IbQ2DzSsi2hERyQOgnXvsiUeM4"
+
+url = ''
 
 # 챔피언 포지션 확인
-def ChampPositionCheck(name):
+async def ChampPositionCheck(name):
     if name in champName.name:
         name = champName.name[name]
 
@@ -42,6 +45,8 @@ def ChampPositionCheck(name):
 
     return championName
 
+
+
 # 봇이 구동되었을 때 보여지는 코드
 @client.event
 async def on_ready():
@@ -66,5 +71,10 @@ async def on_message(message):
         name = message.content.replace(";;champ ","")
         search = ChampPositionCheck(name)
         await channel.send(search)
+
+        if message.content.startswith(';;'):
+            channel = message.channel
+            position = message.content.replace(";;t")
+            await channel.send("탑입니다.")
 
 client.run(token)
